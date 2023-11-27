@@ -1,20 +1,12 @@
+import 'package:isar/isar.dart';
+
+part 'model.g.dart';
+
+@collection
 class Message {
-  static const String columnText = 'text';
-  static const String columnTitle = 'title';
+  Id id = Isar.autoIncrement;
+  String? title;
+  String? text;
 
-  final String title;
-  final String text;
-  Message({required this.title, required this.text});
-
-  Map<String, Object?> toMap() {
-    Map<String, Object?> map = {
-      columnTitle: title,
-      columnText: text,
-    };
-    return map;
-  }
-
-  static Message fromMap(Map map) {
-    return Message(text: map[columnText], title: map[columnTitle]);
-  }
+  
 }

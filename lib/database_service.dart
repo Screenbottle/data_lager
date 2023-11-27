@@ -1,35 +1,30 @@
 import 'package:data_lager/model.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
 
 class DbService {
   static const messageTableName = 'message';
-  late Database db;
+  late Future<Isar> db;
 
   DbService() {
     openDb();
   }
 
-  void putMessagesInDb(Message message) async {
-    int id = await db.insert(messageTableName, message.toMap());
-    print('id $id inserted in db');
+  Future<void> putMessagesInDb(Message message) async {
+    final isar = await db;
+    isar.writeTxn(() => isar.messages.put(message));
   }
 
   Future<List<Message>> getAllMessagesFromDb() async {
-    List<Map<String, Object?>> dbResponse = await db.query(messageTableName);
-    return dbResponse.map((record) => Message.fromMap(record)).toList();
+    final isar = await db;
+    return await isar.messages.where().findAll();
   }
 
-  void openDb() async {
-    db = await openDatabase(
-      join(await getDatabasesPath(), 'message.db'),
-      version: 1,
-      onCreate: _onCreate,
-    );
-  }
-
-  void _onCreate(Database db, int version) async {
-    await db.execute(
-        "CREATE TABLE $messageTableName (id STRING PRIMARY KEY, title TEXT, text TEXT )");
+  Future<Isar> openDb() async {
+    if (Isar.instanceNames.isEmpty) {
+      final dir = await getApplicationCacheDirectory();
+      return Isar.open([MessageSchema], directory: dir.path, inspector: true);
+    }
+    return Future.value(Isar.getInstance());
   }
 }

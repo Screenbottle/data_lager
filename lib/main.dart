@@ -72,9 +72,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
           TextButton(
             onPressed: () {
               widget.dbService.putMessagesInDb(
-                Message(
-                    title: titleTextController.text,
-                    text: textTextcontroller.text),
+                Message()..title = titleTextController.text ..text = textTextcontroller.text,
               );
             },
             child: Text('save message'),
